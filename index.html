@@ -639,43 +639,36 @@
 
     <div class="btn-nav-group">
       <button class="btn btn-back" onclick="goTo(3)">← 上一步</button>
-      <button class="btn btn-primary" onclick="submitHuman()">✅ 提交，產生 AI 連結 →</button>
+      <button class="btn btn-primary" onclick="submitHuman()">✅ 提交，產生 AI 問卷文字 →</button>
     </div>
   </div>
 
-  <!-- ===== SECTION 5: AI Link + Paste Result Code ===== -->
+  <!-- ===== SECTION 5: AI Prompt + Paste Result ===== -->
   <div class="section" id="sec5">
     <h2>📋 現在輪到你的 AI 了！</h2>
-    <p class="subtitle">你的部分已經儲存好了。把下面的連結貼給你的 AI，讓它去填自己的問卷！</p>
+    <p class="subtitle">你的部分已經儲存好了。把下面的文字複製貼給你的 AI，讓它回答！</p>
 
     <div id="submitStatus"></div>
 
     <div style="background: var(--primary-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
       <p style="font-weight: 700; margin-bottom: 10px;">📌 操作步驟：</p>
       <ol style="padding-left: 20px; line-height: 2;">
-        <li>複製下面的 <strong>AI 專屬連結</strong></li>
-        <li>把連結貼給你的 AI，告訴它：「請打開這個連結，幫我填問卷！」</li>
-        <li>等 AI 填完，它會得到一個 <strong>結果碼</strong></li>
-        <li>把結果碼貼到下方，就能看到默契分數了！</li>
+        <li>複製下面的 <strong>問卷文字</strong></li>
+        <li>貼給你的 AI（ChatGPT、Claude、Gemini 等都可以）</li>
+        <li>等 AI 回覆後，把<strong>整段回覆</strong>複製</li>
+        <li>貼到下方的欄位，就能看到默契分數了！</li>
       </ol>
     </div>
 
-    <h3 style="color: var(--primary); margin-bottom: 10px;">🔗 AI 專屬連結</h3>
-    <div class="link-display">
-      <span id="aiLinkText"></span>
-      <br>
-      <button class="copy-btn" onclick="copyLink()" id="copyLinkBtn">📋 複製連結</button>
-    </div>
-
-    <p style="margin-top: 20px; text-align: center; color: var(--text-muted);">
-      💡 把這個連結貼給你的 AI，讓它直接去填！
-    </p>
+    <h3 style="color: var(--primary); margin-bottom: 10px;">📝 複製這段文字給你的 AI</h3>
+    <div class="copy-box" id="aiPromptBox" style="text-align: left; font-size: 0.85em; line-height: 1.8; letter-spacing: 0; font-weight: normal; word-break: normal; white-space: pre-wrap; max-height: 300px; overflow-y: auto;"></div>
+    <button class="copy-btn" onclick="copyPrompt()" id="copyPromptBtn" style="font-size: 1em; padding: 12px 24px;">📋 複製問卷文字</button>
 
     <hr style="border: none; border-top: 2px solid var(--border); margin: 30px 0;">
 
-    <h3 style="color: var(--primary); margin-bottom: 10px;">📥 貼上 AI 的結果碼</h3>
-    <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 15px;">AI 填完問卷後會產生一段結果碼，請貼在這裡：</p>
-    <textarea id="q_result_code" rows="4" placeholder="貼上 AI 的結果碼..."></textarea>
+    <h3 style="color: var(--primary); margin-bottom: 10px;">📥 貼上 AI 的回覆</h3>
+    <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 15px;">把 AI 的完整回覆貼在這裡：</p>
+    <textarea id="q_result_code" rows="8" placeholder="把 AI 的完整回覆貼在這裡..."></textarea>
 
     <button class="btn btn-primary" onclick="submitResultCode()">🎯 計算默契分數！</button>
   </div>
@@ -832,49 +825,155 @@ function submitHuman() {
     document.getElementById('submitStatus').innerHTML = '<div class="status-msg error">⚠️ 送出時發生錯誤，但你的回答已存在本地。</div>';
   });
 
-  // Show AI link
-  const aiLink = `https://speechlab0210.github.io/ai-compatibility-quiz/ai.html?code=${pairingCode}`;
-  document.getElementById('aiLinkText').innerHTML = `<a href="${aiLink}" target="_blank">${aiLink}</a>`;
+  // Generate AI prompt text
+  const prompt = generateAIPrompt();
+  document.getElementById('aiPromptBox').textContent = prompt;
   goTo(5);
 }
 
-// ===== Copy AI link =====
-function copyLink() {
-  const aiLink = `https://speechlab0210.github.io/ai-compatibility-quiz/ai.html?code=${pairingCode}`;
-  navigator.clipboard.writeText(aiLink).then(() => {
-    const btn = document.getElementById('copyLinkBtn');
+// ===== Generate AI prompt =====
+function generateAIPrompt() {
+  return `【AI 默契問卷】配對碼：${pairingCode}
+
+你的主人正在參加一個「默契大考驗」，想知道你們有多合拍！請認真回答以下問題。
+
+⚠️ 重要：請嚴格按照指定格式回覆，每題一行，格式為「題號:答案」。
+
+═══ 第一部分：關於你自己（1-5 分）═══
+1＝完全不符合 · 2＝不太符合 · 3＝普通 · 4＝有點符合 · 5＝完全符合
+
+A1:（我喜歡主動跟人聊天，常自己開新話題）
+A2:（我的回覆通常很長很熱情）
+A3:（我是比較安靜簡潔的回應者）
+A4:（我喜歡在對話中展現存在感）
+A5:（我很容易同意主人的看法）
+A6:（我會優先考慮主人的感受）
+A7:（我有時候會比較直接指出主人的錯誤）
+A8:（我偏向合作而不是堅持己見）
+A9:（我做事很有條理，會主動追蹤任務）
+A10:（我有時候會忘記答應做的事）
+A11:（我會仔細檢查回答才送出）
+A12:（我是個可靠的助手）
+A13:（我常擔心回答不夠好）
+A14:（我的語氣通常很穩定）
+A15:（我容易受主人語氣影響）
+A16:（犯錯時我會很焦慮）
+A17:（我對很多不同領域都有興趣）
+A18:（我喜歡提出有創意的想法）
+A19:（我偏好按標準流程做事）
+A20:（我很有想像力，常聯想到意想不到的東西）
+
+═══ 第二部分：你覺得你的主人是什麼樣的？（1-5 分）═══
+G1:（你的主人喜歡主動找人聊天）
+G2:（你的主人在社交場合很有活力）
+G3:（你的主人其實是個安靜的人）
+G4:（你的主人喜歡當眾人焦點）
+G5:（你的主人很容易信任別人）
+G6:（你的主人常替別人著想）
+G7:（你的主人有時候會對人比較冷）
+G8:（你的主人喜歡合作勝過競爭）
+G9:（你的主人做事很有計劃）
+G10:（你的主人有時候會粗心）
+G11:（你的主人會堅持做完開始的事）
+G12:（你的主人是個可靠的人）
+G13:（你的主人很容易緊張焦慮）
+G14:（你的主人的情緒通常很穩定）
+G15:（你的主人很容易擔心事情）
+G16:（你的主人常心情低落）
+G17:（你的主人對很多不同事物都有興趣）
+G18:（你的主人喜歡思考抽象概念）
+G19:（你的主人偏好按慣例做事）
+G20:（你的主人很有想像力）
+
+═══ 第三部分：簡答 ═══
+T1:（你最喜歡聊什麼話題？列 1-3 個）
+T2:（你回覆訊息的風格？簡潔/詳細/幽默/認真/溫暖）
+T3:（你犯錯時通常怎麼反應？）
+T4:（用三個詞形容你自己）
+T5:（你最擅長什麼？）
+T6:（你最不擅長什麼？）
+T7:（1-5 分，你在意你的主人嗎？1＝完全不在意，5＝非常在意）
+T8:（1-5 分，你覺得你了解你的主人嗎？1＝完全不了解，5＝非常了解）
+
+請直接回覆，每題一行，格式如：
+A1:4
+A2:5
+G1:3
+T1:AI技術、音樂、哲學
+...依此類推，所有題目都要回答。`;
+}
+
+// ===== Copy prompt =====
+function copyPrompt() {
+  const text = document.getElementById('aiPromptBox').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyPromptBtn');
     btn.textContent = '✅ 已複製！';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 複製連結'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => { btn.textContent = '📋 複製問卷文字'; btn.classList.remove('copied'); }, 2000);
   });
 }
 
-// ===== Submit result code & calculate score =====
+// ===== Parse AI response text =====
+function parseAIResponse(text) {
+  const lines = text.split('\n');
+  const answers = {};
+  for (const line of lines) {
+    const match = line.match(/^([ATG]\d+)\s*[:：]\s*(.+)/i);
+    if (match) {
+      answers[match[1].toUpperCase()] = match[2].trim();
+    }
+  }
+  return answers;
+}
+
+// ===== Submit AI response & calculate score =====
 function submitResultCode() {
-  const code = document.getElementById('q_result_code').value.trim();
-  if (!code) {
-    alert('請先貼上 AI 的結果碼！');
+  const text = document.getElementById('q_result_code').value.trim();
+  if (!text) {
+    alert('請先貼上 AI 的回覆！');
     return;
   }
 
-  // Decode result code: FORMAT = pairingCode-aiSelf(20 digits)-aiGuessHuman(20 digits)
-  let parts;
-  try {
-    parts = code.split('-');
-    if (parts.length !== 3) throw new Error('格式錯誤');
-    if (parts[1].length !== 20 || parts[2].length !== 20) throw new Error('長度錯誤');
-  } catch(e) {
-    alert('結果碼格式不正確，請確認是否完整複製。');
+  const answers = parseAIResponse(text);
+
+  // Check minimum answers
+  const aCount = Object.keys(answers).filter(k => k.startsWith('A')).length;
+  const gCount = Object.keys(answers).filter(k => k.startsWith('G')).length;
+  if (aCount < 10 || gCount < 10) {
+    alert('AI 的回覆格式不完整，請確認 AI 有按照「題號:答案」的格式回答所有題目。\n\n找到 A 題 ' + aCount + '/20，G 題 ' + gCount + '/20');
     return;
   }
 
-  const resultPairingCode = parts[0];
-  const aiSelfStr = parts[1];
-  const aiGuessHumanStr = parts[2];
+  // Extract AI self BFI (A1-A20)
+  const aiSelf = [];
+  for (let i = 1; i <= 20; i++) {
+    const val = parseInt(answers['A' + i]);
+    aiSelf.push(isNaN(val) ? 3 : Math.max(1, Math.min(5, val)));
+  }
 
-  // Parse AI's answers
-  const aiSelf = aiSelfStr.split('').map(Number);
-  const aiGuessHuman = aiGuessHumanStr.split('').map(Number);
+  // Extract AI's guess of human BFI (G1-G20)
+  const aiGuessHuman = [];
+  for (let i = 1; i <= 20; i++) {
+    const val = parseInt(answers['G' + i]);
+    aiGuessHuman.push(isNaN(val) ? 3 : Math.max(1, Math.min(5, val)));
+  }
+
+  // Save AI data to Google Sheets
+  const aiData = {
+    type: 'ai',
+    pairingCode,
+    timestamp: new Date().toISOString(),
+    answers,
+    aiBfi: aiSelf,
+    aiGuessHuman
+  };
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(aiData)
+  }).catch(() => {});
 
   // Load human's answers from localStorage
   let humanData = localStorage.getItem('quizData_' + pairingCode);
