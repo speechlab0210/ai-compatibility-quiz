@@ -643,32 +643,58 @@
     </div>
   </div>
 
-  <!-- ===== SECTION 5: AI Prompt + Paste Result ===== -->
+  <!-- ===== SECTION 5: Two options for AI ===== -->
   <div class="section" id="sec5">
     <h2>📋 現在輪到你的 AI 了！</h2>
-    <p class="subtitle">你的部分已經儲存好了。把下面的文字複製貼給你的 AI，讓它回答！</p>
+    <p class="subtitle">你的部分已經儲存好了。選擇一種方式讓你的 AI 填問卷：</p>
 
     <div id="submitStatus"></div>
 
-    <div style="background: var(--primary-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-      <p style="font-weight: 700; margin-bottom: 10px;">📌 操作步驟：</p>
-      <ol style="padding-left: 20px; line-height: 2;">
-        <li>複製下面的 <strong>問卷文字</strong></li>
-        <li>貼給你的 AI（ChatGPT、Claude、Gemini 等都可以）</li>
-        <li>等 AI 回覆後，把<strong>整段回覆</strong>複製</li>
-        <li>貼到下方的欄位，就能看到默契分數了！</li>
-      </ol>
+    <!-- Tab switcher -->
+    <div style="display: flex; gap: 0; margin-bottom: 20px; border-radius: 12px; overflow: hidden; border: 2px solid var(--primary);">
+      <button id="tabText" onclick="switchTab('text')" style="flex:1; padding: 12px; border: none; font-weight: 700; font-size: 1em; cursor: pointer; font-family: inherit; background: var(--primary); color: white;">📝 方法一：貼文字</button>
+      <button id="tabLink" onclick="switchTab('link')" style="flex:1; padding: 12px; border: none; font-weight: 700; font-size: 1em; cursor: pointer; font-family: inherit; background: white; color: var(--primary);">🔗 方法二：傳連結</button>
     </div>
 
-    <h3 style="color: var(--primary); margin-bottom: 10px;">📝 複製這段文字給你的 AI</h3>
-    <div class="copy-box" id="aiPromptBox" style="text-align: left; font-size: 0.85em; line-height: 1.8; letter-spacing: 0; font-weight: normal; word-break: normal; white-space: pre-wrap; max-height: 300px; overflow-y: auto;"></div>
-    <button class="copy-btn" onclick="copyPrompt()" id="copyPromptBtn" style="font-size: 1em; padding: 12px 24px;">📋 複製問卷文字</button>
+    <!-- Option A: Text prompt -->
+    <div id="optionText">
+      <div style="background: var(--primary-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+        <p style="font-weight: 700; margin-bottom: 10px;">📌 適合所有 AI（ChatGPT、Claude、Gemini 等）</p>
+        <ol style="padding-left: 20px; line-height: 2;">
+          <li>複製下面的 <strong>問卷文字</strong></li>
+          <li>貼給你的 AI</li>
+          <li>等 AI 回覆後，把<strong>整段回覆</strong>複製</li>
+          <li>貼到下方的欄位，就能看到默契分數了！</li>
+        </ol>
+      </div>
+
+      <h3 style="color: var(--primary); margin-bottom: 10px;">📝 複製這段文字給你的 AI</h3>
+      <div class="copy-box" id="aiPromptBox" style="text-align: left; font-size: 0.85em; line-height: 1.8; letter-spacing: 0; font-weight: normal; word-break: normal; white-space: pre-wrap; max-height: 300px; overflow-y: auto;"></div>
+      <button class="copy-btn" onclick="copyPrompt()" id="copyPromptBtn" style="font-size: 1em; padding: 12px 24px;">📋 複製問卷文字</button>
+    </div>
+
+    <!-- Option B: Link -->
+    <div id="optionLink" style="display: none;">
+      <div style="background: var(--primary-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+        <p style="font-weight: 700; margin-bottom: 10px;">📌 適合能開網頁的 AI Agent</p>
+        <ol style="padding-left: 20px; line-height: 2;">
+          <li>複製下面的 <strong>連結</strong>，傳給你的 AI</li>
+          <li>告訴它：「請打開這個連結，幫我填問卷」</li>
+          <li>AI 填完後會得到一個 <strong>結果碼</strong></li>
+          <li>把結果碼貼到下方</li>
+        </ol>
+      </div>
+
+      <h3 style="color: var(--primary); margin-bottom: 10px;">🔗 AI 專屬連結</h3>
+      <div class="copy-box" id="aiLinkBox" style="font-size: 0.9em; letter-spacing: 0; word-break: break-all;"></div>
+      <button class="copy-btn" onclick="copyLink()" id="copyLinkBtn" style="font-size: 1em; padding: 12px 24px;">📋 複製連結</button>
+    </div>
 
     <hr style="border: none; border-top: 2px solid var(--border); margin: 30px 0;">
 
     <h3 style="color: var(--primary); margin-bottom: 10px;">📥 貼上 AI 的回覆</h3>
-    <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 15px;">把 AI 的完整回覆貼在這裡：</p>
-    <textarea id="q_result_code" rows="8" placeholder="把 AI 的完整回覆貼在這裡..."></textarea>
+    <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 15px;">把 AI 的回覆（文字回答或結果碼）貼在這裡：</p>
+    <textarea id="q_result_code" rows="8" placeholder="把 AI 的回覆貼在這裡..."></textarea>
 
     <button class="btn btn-primary" onclick="submitResultCode()">🎯 計算默契分數！</button>
   </div>
@@ -828,7 +854,42 @@ function submitHuman() {
   // Generate AI prompt text
   const prompt = generateAIPrompt();
   document.getElementById('aiPromptBox').textContent = prompt;
+
+  // Generate AI link
+  const aiLink = `https://speechlab0210.github.io/ai-compatibility-quiz/ai.html?code=${pairingCode}`;
+  document.getElementById('aiLinkBox').textContent = aiLink;
+
   goTo(5);
+}
+
+// ===== Tab switching =====
+function switchTab(tab) {
+  if (tab === 'text') {
+    document.getElementById('optionText').style.display = 'block';
+    document.getElementById('optionLink').style.display = 'none';
+    document.getElementById('tabText').style.background = 'var(--primary)';
+    document.getElementById('tabText').style.color = 'white';
+    document.getElementById('tabLink').style.background = 'white';
+    document.getElementById('tabLink').style.color = 'var(--primary)';
+  } else {
+    document.getElementById('optionText').style.display = 'none';
+    document.getElementById('optionLink').style.display = 'block';
+    document.getElementById('tabLink').style.background = 'var(--primary)';
+    document.getElementById('tabLink').style.color = 'white';
+    document.getElementById('tabText').style.background = 'white';
+    document.getElementById('tabText').style.color = 'var(--primary)';
+  }
+}
+
+// ===== Copy AI link =====
+function copyLink() {
+  const aiLink = `https://speechlab0210.github.io/ai-compatibility-quiz/ai.html?code=${pairingCode}`;
+  navigator.clipboard.writeText(aiLink).then(() => {
+    const btn = document.getElementById('copyLinkBtn');
+    btn.textContent = '✅ 已複製！';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 複製連結'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 // ===== Generate AI prompt =====
@@ -935,28 +996,33 @@ function submitResultCode() {
     return;
   }
 
-  const answers = parseAIResponse(text);
+  let aiSelf, aiGuessHuman;
 
-  // Check minimum answers
-  const aCount = Object.keys(answers).filter(k => k.startsWith('A')).length;
-  const gCount = Object.keys(answers).filter(k => k.startsWith('G')).length;
-  if (aCount < 10 || gCount < 10) {
-    alert('AI 的回覆格式不完整，請確認 AI 有按照「題號:答案」的格式回答所有題目。\n\n找到 A 題 ' + aCount + '/20，G 題 ' + gCount + '/20');
-    return;
-  }
-
-  // Extract AI self BFI (A1-A20)
-  const aiSelf = [];
-  for (let i = 1; i <= 20; i++) {
-    const val = parseInt(answers['A' + i]);
-    aiSelf.push(isNaN(val) ? 3 : Math.max(1, Math.min(5, val)));
-  }
-
-  // Extract AI's guess of human BFI (G1-G20)
-  const aiGuessHuman = [];
-  for (let i = 1; i <= 20; i++) {
-    const val = parseInt(answers['G' + i]);
-    aiGuessHuman.push(isNaN(val) ? 3 : Math.max(1, Math.min(5, val)));
+  // Try to detect format: result code (CODE-20digits-20digits) or text response
+  const codeMatch = text.match(/^([A-Z0-9]{8})-(\d{20})-(\d{20})$/);
+  if (codeMatch) {
+    // Result code format from ai.html
+    aiSelf = codeMatch[2].split('').map(Number);
+    aiGuessHuman = codeMatch[3].split('').map(Number);
+  } else {
+    // Text response format
+    const answers = parseAIResponse(text);
+    const aCount = Object.keys(answers).filter(k => k.startsWith('A')).length;
+    const gCount = Object.keys(answers).filter(k => k.startsWith('G')).length;
+    if (aCount < 10 || gCount < 10) {
+      alert('AI 的回覆格式不完整。\n\n如果用「貼文字」方式：請確認 AI 有按照「A1:4」格式回答。\n找到 A 題 ' + aCount + '/20，G 題 ' + gCount + '/20\n\n如果用「傳連結」方式：請貼上 AI 給你的結果碼（格式：配對碼-20位數字-20位數字）。');
+      return;
+    }
+    aiSelf = [];
+    for (let i = 1; i <= 20; i++) {
+      const val = parseInt(answers['A' + i]);
+      aiSelf.push(isNaN(val) ? 3 : Math.max(1, Math.min(5, val)));
+    }
+    aiGuessHuman = [];
+    for (let i = 1; i <= 20; i++) {
+      const val = parseInt(answers['G' + i]);
+      aiGuessHuman.push(isNaN(val) ? 3 : Math.max(1, Math.min(5, val)));
+    }
   }
 
   // Save AI data to Google Sheets
@@ -964,9 +1030,9 @@ function submitResultCode() {
     type: 'ai',
     pairingCode,
     timestamp: new Date().toISOString(),
-    answers,
     aiBfi: aiSelf,
-    aiGuessHuman
+    aiGuessHuman,
+    rawResponse: text.substring(0, 2000)
   };
   fetch(SHEETS_URL, {
     method: 'POST',

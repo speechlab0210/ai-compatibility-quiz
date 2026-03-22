@@ -374,14 +374,14 @@
       <div class="step-arrow">→</div>
       <div class="step-item">
         <div class="step-num">2</div>
-        <h3>Send AI the Link</h3>
-        <p>Give your AI its own link to fill out</p>
+        <h3>Send AI the Text</h3>
+        <p>Copy the questionnaire text and paste it to your AI</p>
       </div>
       <div class="step-arrow">→</div>
       <div class="step-item">
         <div class="step-num">3</div>
         <h3>See Your Score</h3>
-        <p>AI gets a result code — paste it back to see your score!</p>
+        <p>Paste AI's response back to see your compatibility score!</p>
       </div>
     </div>
   </div>
@@ -625,43 +625,36 @@
 
     <div class="btn-nav-group">
       <button class="btn btn-back" onclick="goTo(3)">← Back</button>
-      <button class="btn btn-primary" onclick="submitHuman()">✅ Submit & Get AI Link →</button>
+      <button class="btn btn-primary" onclick="submitHuman()">✅ Submit & Generate AI Questionnaire Text →</button>
     </div>
   </div>
 
-  <!-- ===== SECTION 5: AI Link + Paste Result Code ===== -->
+  <!-- ===== SECTION 5: AI Prompt + Paste Result ===== -->
   <div class="section" id="sec5">
     <h2>📋 Now It's Your AI's Turn!</h2>
-    <p class="subtitle">Your part has been saved. Send the link below to your AI and let it fill out its own questionnaire!</p>
+    <p class="subtitle">Your part has been saved. Copy the text below and paste it to your AI to let it answer!</p>
 
     <div id="submitStatus"></div>
 
     <div style="background: var(--primary-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
       <p style="font-weight: 700; margin-bottom: 10px;">📌 Instructions:</p>
       <ol style="padding-left: 20px; line-height: 2;">
-        <li>Copy the <strong>AI link</strong> below</li>
-        <li>Send it to your AI and say: "Please open this link and fill out the questionnaire!"</li>
-        <li>Wait for your AI to finish — it will get a <strong>result code</strong></li>
-        <li>Paste the result code below to see your compatibility score!</li>
+        <li>Copy the <strong>questionnaire text</strong> below</li>
+        <li>Paste it to your AI (ChatGPT, Claude, Gemini, etc.)</li>
+        <li>Wait for the AI to reply, then <strong>copy its entire response</strong></li>
+        <li>Paste it in the field below to see your compatibility score!</li>
       </ol>
     </div>
 
-    <h3 style="color: var(--primary); margin-bottom: 10px;">🔗 AI's Link</h3>
-    <div class="link-display">
-      <span id="aiLinkText"></span>
-      <br>
-      <button class="copy-btn" onclick="copyLink()" id="copyLinkBtn">📋 Copy Link</button>
-    </div>
-
-    <p style="margin-top: 20px; text-align: center; color: var(--text-muted);">
-      💡 Send this link to your AI and let it fill in directly!
-    </p>
+    <h3 style="color: var(--primary); margin-bottom: 10px;">📝 Copy This Text to Your AI</h3>
+    <div class="copy-box" id="aiPromptBox" style="text-align: left; font-size: 0.85em; line-height: 1.8; letter-spacing: 0; font-weight: normal; word-break: normal; white-space: pre-wrap; max-height: 300px; overflow-y: auto;"></div>
+    <button class="copy-btn" onclick="copyPrompt()" id="copyPromptBtn" style="font-size: 1em; padding: 12px 24px;">📋 Copy Questionnaire Text</button>
 
     <hr style="border: none; border-top: 2px solid var(--border); margin: 30px 0;">
 
-    <h3 style="color: var(--primary); margin-bottom: 10px;">📥 Paste AI's Result Code</h3>
-    <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 15px;">After your AI finishes the questionnaire, it will get a result code. Paste it here:</p>
-    <textarea id="q_result_code" rows="4" placeholder="Paste the AI's result code here..."></textarea>
+    <h3 style="color: var(--primary); margin-bottom: 10px;">📥 Paste AI's Response</h3>
+    <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 15px;">Paste your AI's complete response here:</p>
+    <textarea id="q_result_code" rows="8" placeholder="Paste your AI's complete response here..."></textarea>
 
     <button class="btn btn-primary" onclick="submitResultCode()">🎯 Calculate Compatibility Score!</button>
   </div>
