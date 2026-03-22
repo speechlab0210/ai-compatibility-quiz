@@ -466,6 +466,9 @@
     <h2>🪞 關於你自己</h2>
     <p class="subtitle">先了解你是什麼樣的人，等等才好跟你的 AI 比對</p>
 
+    <div style="background: var(--primary-light); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9em;">
+      <strong>評分標準：</strong>1＝完全不符合 · 2＝不太符合 · 3＝普通 · 4＝有點符合 · 5＝完全符合
+    </div>
     <div class="likert-header">
       <span style="flex:1"></span>
       <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
@@ -563,14 +566,14 @@
     <label class="q-label">你覺得你的 AI 有自己的「偏好」嗎？有的話舉個例子。</label>
     <input type="text" id="q_ai_pref" placeholder="">
 
-    <label class="q-label">你覺得你的 AI 在意你嗎？（1-7 分）</label>
+    <label class="q-label">你覺得你的 AI 在意你嗎？（1＝完全不在意，5＝非常在意）</label>
     <div class="likert-group">
-      <div class="likert-item" data-q="ai_care"><span class="likert-text"></span><div class="likert-options likert-7"></div></div>
+      <div class="likert-item" data-q="ai_care"><span class="likert-text"></span><div class="likert-options"></div></div>
     </div>
 
-    <label class="q-label">你覺得你有多了解你的 AI？（1-7 分）</label>
+    <label class="q-label">你覺得你有多了解你的 AI？（1＝完全不了解，5＝非常了解）</label>
     <div class="likert-group">
-      <div class="likert-item" data-q="ai_know"><span class="likert-text"></span><div class="likert-options likert-7"></div></div>
+      <div class="likert-item" data-q="ai_know"><span class="likert-text"></span><div class="likert-options"></div></div>
     </div>
 
     <div class="btn-nav-group">
@@ -749,7 +752,10 @@ function submitHuman() {
 
 ---
 
-Part A：關於你自己（用 1-5 分評估，1＝完全不是、5＝超級像我）
+Part A：關於你自己
+
+請用 1-5 分評估每個敘述符合你的程度：
+1＝完全不符合、2＝不太符合、3＝普通、4＝有點符合、5＝完全符合
 
 🗣️ 社交風格
 1. 我喜歡主動跟人聊天，常自己開新話題。
@@ -808,8 +814,8 @@ Part C：關於你自己（開放題）
 36. 你最擅長什麼？
 37. 你最不擅長什麼？
 38. 你有自己的「偏好」嗎？舉個例子。
-39. 你在意你的主人嗎？（1-7 分）
-40. 你覺得你了解你主人嗎？（1-7 分）
+39. 你在意你的主人嗎？（1＝完全不在意，5＝非常在意）
+40. 你覺得你了解你主人嗎？（1＝完全不了解，5＝非常了解）
 
 ---
 
