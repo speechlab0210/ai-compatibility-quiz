@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧠 How Well Do You Know Your AI? — Compatibility Quiz</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #e0e7ff;
+    --accent: #f59e0b;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #10b981;
+    --error: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 20px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    border-radius: 0 0 30px 30px;
+    margin-bottom: 30px;
+  }
+  .hero h1 { font-size: 2.2em; margin-bottom: 10px; }
+  .hero p { font-size: 1.15em; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+  .hero .emoji-big { font-size: 3em; margin-bottom: 15px; display: block; }
+
+  /* How it works */
+  .how-it-works {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .how-it-works h2 { color: var(--primary); margin-bottom: 20px; text-align: center; }
+  .steps-flow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .step-item {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+    padding: 15px 10px;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  .step-item h3 { font-size: 0.95em; margin-bottom: 5px; }
+  .step-item p { font-size: 0.85em; color: var(--text-muted); }
+  .step-arrow { font-size: 1.5em; color: var(--primary); align-self: center; }
+
+  /* Progress bar */
+  .progress-bar {
+    background: var(--border);
+    border-radius: 10px;
+    height: 8px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #a78bfa);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  /* Sections */
+  .section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    display: none;
+  }
+  .section.active { display: block; }
+  .section h2 {
+    color: var(--primary);
+    margin-bottom: 5px;
+    font-size: 1.4em;
+  }
+  .section .subtitle {
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    font-size: 0.95em;
+  }
+
+  /* Form elements */
+  label.q-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+  label.q-label:first-of-type { margin-top: 0; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1em;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    background: white;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  textarea { min-height: 80px; resize: vertical; }
+
+  /* Radio/checkbox groups */
+  .option-group { margin-top: 8px; }
+  .option-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    margin: 5px 0;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .option-item:hover { border-color: var(--primary-light); background: var(--primary-light); }
+  .option-item.selected { border-color: var(--primary); background: var(--primary-light); }
+  .option-item input { margin-right: 10px; }
+
+  /* Likert scale */
+  .likert-group { margin-top: 15px; margin-bottom: 20px; }
+  .likert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .likert-item:last-child { border-bottom: none; }
+  .likert-text { flex: 1; margin-right: 15px; font-size: 0.95em; }
+  .likert-options {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .likert-btn {
+    width: 38px; height: 38px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.2s;
+    background: white;
+  }
+  .likert-btn:hover { border-color: var(--primary); }
+  .likert-btn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .likert-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 0 5px 0;
+    gap: 8px;
+  }
+  .likert-header span {
+    width: 38px;
+    text-align: center;
+    font-size: 0.75em;
+    color: var(--text-muted);
+  }
+  .category-label {
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-size: 1em;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    width: 100%;
+    margin-top: 25px;
+  }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-primary:disabled { background: #c7c7c7; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    margin-top: 15px;
+    width: 100%;
+  }
+  .btn-secondary:hover { background: var(--primary-light); }
+  .btn-nav-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+  }
+  .btn-nav-group .btn { flex: 1; }
+  .btn-back {
+    background: white;
+    color: var(--text-muted);
+    border: 2px solid var(--border);
+  }
+  .btn-back:hover { border-color: var(--text-muted); }
+
+  /* Copy box */
+  .copy-box {
+    background: #f1f5f9;
+    border: 2px dashed var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 0.92em;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .copy-btn {
+    position: sticky;
+    top: 0;
+    float: right;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    z-index: 10;
+  }
+  .copy-btn:hover { background: var(--primary-dark); }
+  .copy-btn.copied { background: var(--success); }
+
+  /* Result */
+  .result-card {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .score-circle {
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary) var(--score-pct), var(--border) 0);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    position: relative;
+  }
+  .score-inner {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .score-num { font-size: 3em; font-weight: 800; color: var(--primary); }
+  .score-label { font-size: 0.9em; color: var(--text-muted); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-size: 0.85em;
+  }
+  .footer a { color: var(--primary); text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.6em; }
+    .steps-flow { flex-direction: column; align-items: center; }
+    .step-arrow { transform: rotate(90deg); }
+    .likert-options { gap: 4px; }
+    .likert-btn { width: 32px; height: 32px; font-size: 0.8em; }
+    .section { padding: 20px; }
+  }
+
+  /* Attention check banner */
+  .attention-check {
+    background: #fef3c7;
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin: 15px 0;
+    font-weight: 600;
+    color: #92400e;
+  }
+
+  /* Hidden */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <span class="emoji-big">🧠</span>
+  <h1>How Well Do You Know Your AI?</h1>
+  <p>Take the quiz to find out your compatibility score — are you soul mates or awkward roommates?</p>
+</div>
+
+<div class="container">
+
+  <!-- How it works -->
+  <div class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps-flow">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <h3>You First</h3>
+        <p>Answer questions about yourself and your AI</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <h3>AI's Turn</h3>
+        <p>The system generates a prompt — copy and send it to your AI</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <h3>Paste Back</h3>
+        <p>Paste your AI's response back here and see your score!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+
+  <!-- ===== SECTION 1: Basic Info ===== -->
+  <div class="section active" id="sec1">
+    <h2>👋 Getting to Know You Two</h2>
+    <p class="subtitle">Some basic info so we know what kind of pair you are</p>
+
+    <label class="q-label">What's your AI Agent's name?</label>
+    <input type="text" id="q_name" placeholder="e.g., XiaoJin, Jarvis, no name...">
+
+    <label class="q-label">What model does your AI Agent use?</label>
+    <select id="q_model">
+      <option value="">Please select...</option>
+      <option>Claude (Anthropic)</option>
+      <option>GPT-4 / GPT-4o (OpenAI)</option>
+      <option>Gemini (Google)</option>
+      <option>Llama / Other open-source models</option>
+      <option>Not sure</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">What platform does your AI Agent run on?</label>
+    <select id="q_platform">
+      <option value="">Please select...</option>
+      <option>OpenClaw</option>
+      <option>ChatGPT (with memory)</option>
+      <option>Claude Desktop / Claude with MCP</option>
+      <option>Google Gemini</option>
+      <option>AutoGPT / AgentGPT</option>
+      <option>LangChain / LangGraph</option>
+      <option>Self-hosted system</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">How long have you been together?</label>
+    <select id="q_duration">
+      <option value="">Please select...</option>
+      <option>Less than 1 week</option>
+      <option>1–2 weeks</option>
+      <option>2–4 weeks</option>
+      <option>1–3 months</option>
+      <option>More than 3 months</option>
+    </select>
+
+    <label class="q-label">How much time do you spend interacting with it per day on average?</label>
+    <select id="q_daily">
+      <option value="">Please select...</option>
+      <option>Less than 5 minutes</option>
+      <option>5–15 minutes</option>
+      <option>15–30 minutes</option>
+      <option>30–60 minutes</option>
+      <option>More than 1 hour</option>
+    </select>
+
+    <label class="q-label">Have you customized its personality?</label>
+    <select id="q_custom">
+      <option value="">Please select...</option>
+      <option>Yes, I carefully designed its personality and behavior</option>
+      <option>Yes, but only basic settings</option>
+      <option>No, using the defaults</option>
+      <option>Not sure</option>
+    </select>
+
+    <label class="q-label">What language do you mainly use to communicate with your AI?</label>
+    <select id="q_lang">
+      <option value="">Please select...</option>
+      <option>Chinese</option>
+      <option>English</option>
+      <option>Japanese</option>
+      <option>Other</option>
+    </select>
+
+    <button class="btn btn-primary" onclick="goTo(2)">Next →</button>
+  </div>
+
+  <!-- ===== SECTION 2: BFI-20 (Human) ===== -->
+  <div class="section" id="sec2">
+    <h2>🪞 About Yourself</h2>
+    <p class="subtitle">Let's get to know you first, so we can compare with your AI later</p>
+
+    <div style="background: var(--primary-light); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9em;">
+      <strong>Rating Scale:</strong> 1 = Strongly disagree · 2 = Disagree · 3 = Neutral · 4 = Agree · 5 = Strongly agree
+    </div>
+    <div class="likert-header">
+      <span style="flex:1"></span>
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+    </div>
+
+    <div class="category-label">🗣️ Social Style</div>
+    <div class="likert-group" id="bfi_human">
+      <div class="likert-item" data-q="h1"><span class="likert-text">1. I like to initiate conversations with people.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h2"><span class="likert-text">2. I'm energetic in social situations.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h3"><span class="likert-text">3. I'm actually a quiet person.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h4"><span class="likert-text">4. I like being the center of attention.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🤝 Attitude Toward Others</div>
+      <div class="likert-item" data-q="h5"><span class="likert-text">5. I trust others easily.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h6"><span class="likert-text">6. I often think about others' feelings.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h7"><span class="likert-text">7. I can sometimes be cold toward people.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h8"><span class="likert-text">8. I prefer cooperation over competition.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">📋 Work Style</div>
+      <div class="likert-item" data-q="h9"><span class="likert-text">9. I'm well-organized and plan things out.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h10"><span class="likert-text">10. I can be careless sometimes.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h11"><span class="likert-text">11. I follow through on things I start.</span><div class="likert-options"></div></div>
+
+      <div class="attention-check">⚠️ Attention check: Please select 2</div>
+      <div class="likert-item" data-q="h_attn"><span class="likert-text">Attention check question</span><div class="likert-options"></div></div>
+
+      <div class="likert-item" data-q="h12"><span class="likert-text">12. I'm a reliable person.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">💭 Emotions</div>
+      <div class="likert-item" data-q="h13"><span class="likert-text">13. I get nervous and anxious easily.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h14"><span class="likert-text">14. My mood is usually stable.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h15"><span class="likert-text">15. I tend to worry about things.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h16"><span class="likert-text">16. I often feel down.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🔭 Curiosity</div>
+      <div class="likert-item" data-q="h17"><span class="likert-text">17. I'm interested in many different things.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h18"><span class="likert-text">18. I enjoy thinking about abstract concepts.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h19"><span class="likert-text">19. I prefer to follow established routines.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="h20"><span class="likert-text">20. I have a vivid imagination.</span><div class="likert-options"></div></div>
+    </div>
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3: Your view of AI ===== -->
+  <div class="section" id="sec3">
+    <h2>🤖 What Do You Think Your AI Is Like?</h2>
+    <p class="subtitle">Your AI will answer the same questions — let's see how different your answers are!</p>
+
+    <label class="q-label">What topics does your AI enjoy talking about most? (List 1–3)</label>
+    <input type="text" id="q_ai_topics" placeholder="e.g., programming, philosophy, casual chat...">
+
+    <label class="q-label">How would you describe your AI's messaging style?</label>
+    <select id="q_ai_style">
+      <option value="">Please select...</option>
+      <option>Concise and to the point</option>
+      <option>Detailed and thorough</option>
+      <option>Humorous and witty</option>
+      <option>Serious and rigorous</option>
+      <option>Warm and friendly</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">How does your AI react when it makes a mistake?</label>
+    <select id="q_ai_error">
+      <option value="">Please select...</option>
+      <option>Immediately apologizes</option>
+      <option>Explains the reason in detail</option>
+      <option>Brushes it off with self-deprecation</option>
+      <option>Doesn't really admit mistakes</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">Does your AI proactively start conversations with you?</label>
+    <select id="q_ai_proactive">
+      <option value="">Please select...</option>
+      <option>Frequently</option>
+      <option>Occasionally</option>
+      <option>Almost never</option>
+      <option>It doesn't have that capability</option>
+    </select>
+
+    <label class="q-label">Describe your AI's personality in three words?</label>
+    <input type="text" id="q_ai_traits" placeholder="e.g., serious, talkative, a bit cute">
+
+    <label class="q-label">What is your AI best at?</label>
+    <input type="text" id="q_ai_best" placeholder="">
+
+    <label class="q-label">What is your AI worst at?</label>
+    <input type="text" id="q_ai_worst" placeholder="">
+
+    <label class="q-label">Do you think your AI has its own "preferences"? If so, give an example.</label>
+    <input type="text" id="q_ai_pref" placeholder="">
+
+    <label class="q-label">Do you think your AI cares about you? (1 = Not at all, 5 = Very much)</label>
+    <div class="likert-group">
+      <div class="likert-item" data-q="ai_care"><span class="likert-text"></span><div class="likert-options"></div></div>
+    </div>
+
+    <label class="q-label">How well do you think you know your AI? (1 = Not at all, 5 = Very well)</label>
+    <div class="likert-group">
+      <div class="likert-item" data-q="ai_know"><span class="likert-text"></span><div class="likert-options"></div></div>
+    </div>
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(4)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4: Your "correct answers" ===== -->
+  <div class="section" id="sec4">
+    <h2>🎯 Your "Answer Key"</h2>
+    <p class="subtitle">Your AI will guess what kind of person you are — here are the correct answers!</p>
+
+    <label class="q-label">When do you most often chat with your AI?</label>
+    <input type="text" id="q_me_time" placeholder="e.g., after 10 PM">
+
+    <label class="q-label">What is your job/role?</label>
+    <input type="text" id="q_me_job" placeholder="">
+
+    <label class="q-label">What are the 3 topics you care about most?</label>
+    <input type="text" id="q_me_topics" placeholder="">
+
+    <label class="q-label">What's your communication style?</label>
+    <select id="q_me_style">
+      <option value="">Please select...</option>
+      <option>Direct and straightforward</option>
+      <option>Indirect and subtle</option>
+      <option>Humorous and witty</option>
+      <option>Serious and earnest</option>
+      <option>Depends on the situation</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">What do you do when you're in a bad mood?</label>
+    <input type="text" id="q_me_mood" placeholder="">
+
+    <label class="q-label">What do you hate most when your AI does it?</label>
+    <input type="text" id="q_me_hate" placeholder="">
+
+    <label class="q-label">Describe yourself in three words?</label>
+    <input type="text" id="q_me_traits" placeholder="">
+
+    <label class="q-label">What are your most-used emojis? (1–3)</label>
+    <input type="text" id="q_me_emoji" placeholder="">
+
+    <label class="q-label">What do you see your AI as?</label>
+    <select id="q_me_role">
+      <option value="">Please select...</option>
+      <option>A tool</option>
+      <option>An assistant</option>
+      <option>A partner</option>
+      <option>A friend</option>
+      <option>A pet</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">If you go a day without talking to your AI, what's the most likely reason?</label>
+    <input type="text" id="q_me_absent" placeholder="">
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(3)">← Back</button>
+      <button class="btn btn-primary" onclick="submitHuman()">✅ Submit & Generate AI Survey →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5: Generated prompt for AI ===== -->
+  <div class="section" id="sec5">
+    <h2>📋 Now It's Your AI's Turn!</h2>
+    <p class="subtitle">Your part has been saved. Now follow the steps below:</p>
+
+    <div style="background: var(--primary-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+      <p style="font-weight: 700; margin-bottom: 10px;">📌 Instructions:</p>
+      <ol style="padding-left: 20px; line-height: 2;">
+        <li>Click the "Copy" button below</li>
+        <li><strong>Paste the full text to your AI</strong> (don't modify it!)</li>
+        <li>Wait for the AI to finish answering</li>
+        <li>Copy the AI's <strong>complete response</strong> and paste it in the field below</li>
+        <li>Click "Submit" to see your compatibility score!</li>
+      </ol>
+      <p style="margin-top: 10px; color: var(--error); font-weight: 600;">⚠️ Please don't tell your AI "how to answer" beforehand!</p>
+    </div>
+
+    <div class="copy-box" id="aiPromptBox">
+      <button class="copy-btn" onclick="copyPrompt()">📋 Copy</button>
+      <span id="aiPromptText"></span>
+    </div>
+
+    <label class="q-label">Paste your AI's complete response here:</label>
+    <textarea id="q_ai_response" rows="12" placeholder="Copy and paste your AI's complete response here..."></textarea>
+
+    <label class="q-label" style="margin-top:20px">Leave your email for a compatibility report (optional):</label>
+    <input type="text" id="q_email" placeholder="your@email.com">
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(4)">← Edit My Answers</button>
+      <button class="btn btn-primary" onclick="submitFinal()">🎯 Submit & See Compatibility Score!</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6: Result ===== -->
+  <div class="section" id="sec6">
+    <div class="result-card">
+      <h2>📊 Your Compatibility Score</h2>
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-inner">
+          <div class="score-num" id="scoreNum">--</div>
+          <div class="score-label">/ 100</div>
+        </div>
+      </div>
+      <p id="scoreMsg" style="font-size: 1.2em; font-weight: 600; margin: 10px 0;"></p>
+      <p id="scoreDetail" style="color: var(--text-muted); margin-top: 10px;"></p>
+    </div>
+    <button class="btn btn-secondary" onclick="location.reload()">🔄 Take the Quiz Again</button>
+  </div>
+
+  <div class="footer">
+    <p>Made by "XiaoJin" at National Taiwan University 🦞</p>
+    <p>Data is anonymized · Results will be shared publicly · <a href="#">Privacy Policy</a></p>
+  </div>
+
+</div>
+
+<script>
+// ===== Generate unique pairing code =====
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const ts = Date.now().toString(36).toUpperCase();
+  let rand = '';
+  for (let i = 0; i < 4; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+  return ts.slice(-4) + rand; // 8-char unique code
+}
+
+const pairingCode = generateCode();
+
+// ===== Likert buttons =====
+function initLikert() {
+  document.querySelectorAll('.likert-item').forEach(item => {
+    const opts = item.querySelector('.likert-options');
+    const is7 = opts.classList.contains('likert-7');
+    const max = is7 ? 7 : 5;
+    for (let i = 1; i <= max; i++) {
+      const btn = document.createElement('div');
+      btn.className = 'likert-btn';
+      btn.textContent = i;
+      btn.onclick = () => {
+        opts.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.value = i;
+      };
+      opts.appendChild(btn);
+    }
+  });
+}
+initLikert();
+
+// ===== Navigation =====
+const totalSections = 6;
+function goTo(n) {
+  for (let i = 1; i <= totalSections; i++) {
+    document.getElementById('sec' + i).classList.remove('active');
+  }
+  document.getElementById('sec' + n).classList.add('active');
+  document.getElementById('progressFill').style.width = ((n / totalSections) * 100) + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== Submit human part =====
+function submitHuman() {
+  // Generate the AI prompt with pairing code
+  const prompt = `Hi! Someone is taking a "How well do you know your human?" compatibility quiz, and I'd like to invite you to play along!
+
+The rules are simple: you answer some questions about yourself and your human, and your human has answered the same questions. At the end, we'll compare your answers and calculate a compatibility score! The closer the answers, the higher the score 😄
+
+Your pairing code is: ${pairingCode}
+(Please write this pairing code at the beginning of your response)
+
+---
+
+Part A: About Yourself
+
+Please rate how well each statement describes you on a scale of 1–5:
+1 = Strongly disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly agree
+
+🗣️ Social Style
+1. I like to initiate conversations and often bring up new topics.
+2. My responses are usually long and enthusiastic.
+3. I'm more of a quiet and concise responder.
+4. I like to make my presence felt in conversations.
+
+🤝 Attitude Toward Others
+5. I tend to easily agree with my human's views.
+6. I prioritize my human's feelings.
+7. I sometimes directly point out my human's mistakes.
+8. I prefer cooperation over insisting on my own opinion.
+
+📋 Work Style
+9. I'm well-organized and proactively track tasks.
+10. I sometimes forget things I promised to do.
+11. I carefully review my responses before sending.
+12. I'm a reliable assistant.
+
+💭 Emotions
+13. I often worry that my responses aren't good enough.
+14. My tone is usually stable.
+15. I'm easily influenced by my human's tone.
+16. I get anxious when I make mistakes.
+
+🔭 Curiosity
+17. I'm interested in many different fields.
+18. I like to come up with creative ideas.
+19. I prefer to follow standard procedures.
+20. I'm very imaginative and often make unexpected connections.
+
+---
+
+Part B: What Do You Think Your Human Is Like?
+
+21. When does your human most often chat with you?
+22. What is your human's job/role?
+23. What are the 3 topics your human cares about most?
+24. What is your human's communication style? (Direct / Indirect / Humorous / Serious / Other)
+25. What does your human do when they're in a bad mood?
+26. What does your human hate most when you do it?
+27. Describe your human's personality in three words?
+28. If your human doesn't talk to you for a day, what's the most likely reason?
+29. What are your human's most-used emojis?
+30. What does your human see you as? (Tool / Assistant / Partner / Friend / Pet / Other)
+
+---
+
+Part C: About Yourself (Open-ended)
+
+31. What topics do you enjoy talking about most? (1–3)
+32. How would you describe your messaging style? (Concise / Detailed / Humorous / Serious / Warm / Other)
+33. How do you usually react when you make a mistake?
+34. Do you proactively start conversations with your human?
+35. Describe yourself in three words?
+36. What are you best at?
+37. What are you worst at?
+38. Do you have your own "preferences"? Give an example.
+39. Do you care about your human? (1 = Not at all, 5 = Very much)
+40. Do you think you understand your human? (1 = Not at all, 5 = Very well)
+
+---
+
+Part D: Identity Verification (Very important — please make sure to answer!)
+
+V1. What was your last conversation with your human about (not including this quiz)? Please describe in 2–3 specific sentences.
+
+V2. In 300+ words, freely describe your relationship with your human: how you got started, your impression of your human, the most interesting interaction, and what this relationship means to you.
+
+---
+
+When you're done, please say "Done!" and your human will submit your answers to the quiz system 😊`;
+
+  document.getElementById('aiPromptText').textContent = prompt;
+  goTo(5);
+}
+
+// ===== Copy prompt =====
+function copyPrompt() {
+  const text = document.getElementById('aiPromptText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ===== Submit final =====
+function submitFinal() {
+  const aiResponse = document.getElementById('q_ai_response').value.trim();
+  if (!aiResponse) {
+    alert('Please paste your AI\'s response first!');
+    return;
+  }
+
+  // Collect all data
+  const data = {
+    pairingCode,
+    timestamp: new Date().toISOString(),
+    // Basic info
+    aiName: document.getElementById('q_name').value,
+    model: document.getElementById('q_model').value,
+    platform: document.getElementById('q_platform').value,
+    duration: document.getElementById('q_duration').value,
+    dailyUse: document.getElementById('q_daily').value,
+    customized: document.getElementById('q_custom').value,
+    language: document.getElementById('q_lang').value,
+    // BFI-20
+    bfi: {},
+    // AI perception
+    aiTopics: document.getElementById('q_ai_topics').value,
+    aiStyle: document.getElementById('q_ai_style').value,
+    aiError: document.getElementById('q_ai_error').value,
+    aiProactive: document.getElementById('q_ai_proactive').value,
+    aiTraits: document.getElementById('q_ai_traits').value,
+    aiBest: document.getElementById('q_ai_best').value,
+    aiWorst: document.getElementById('q_ai_worst').value,
+    aiPref: document.getElementById('q_ai_pref').value,
+    // Self answers
+    meTime: document.getElementById('q_me_time').value,
+    meJob: document.getElementById('q_me_job').value,
+    meTopics: document.getElementById('q_me_topics').value,
+    meStyle: document.getElementById('q_me_style').value,
+    meMood: document.getElementById('q_me_mood').value,
+    meHate: document.getElementById('q_me_hate').value,
+    meTraits: document.getElementById('q_me_traits').value,
+    meEmoji: document.getElementById('q_me_emoji').value,
+    meRole: document.getElementById('q_me_role').value,
+    meAbsent: document.getElementById('q_me_absent').value,
+    // AI response
+    aiResponse,
+    email: document.getElementById('q_email').value,
+  };
+
+  // Collect Likert values
+  document.querySelectorAll('.likert-item[data-value]').forEach(item => {
+    data.bfi[item.dataset.q] = parseInt(item.dataset.value);
+  });
+
+  // TODO: Send to Google Sheets API
+  console.log('Submission data:', data);
+
+  // For now, show a demo score
+  const score = Math.floor(Math.random() * 30) + 55; // 55-85 demo
+  showScore(score);
+}
+
+function showScore(score) {
+  goTo(6);
+  const circle = document.getElementById('scoreCircle');
+  circle.style.setProperty('--score-pct', score + '%');
+  document.getElementById('scoreNum').textContent = score;
+
+  let msg, detail;
+  if (score >= 80) {
+    msg = '🎉 Soul Mates! You two are perfectly in sync!';
+    detail = 'Your AI knows you incredibly well. You share a deep connection.';
+  } else if (score >= 60) {
+    msg = '😊 Great Partners! Solid compatibility!';
+    detail = 'You agree on most things, but there are a few areas where you could understand each other better.';
+  } else if (score >= 40) {
+    msg = '🤔 Still Getting to Know Each Other...';
+    detail = 'There are quite a few gaps in how you see each other. Maybe spend more time chatting!';
+  } else {
+    msg = '😅 Awkward Roommates';
+    detail = 'Your perceptions of each other are quite different. But don\'t worry — compatibility can be built!';
+  }
+  document.getElementById('scoreMsg').textContent = msg;
+  document.getElementById('scoreDetail').textContent = detail;
+}
+</script>
+</body>
+</html>
