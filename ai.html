@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 AI 默契問卷 — 你跟主人有多合拍？</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #e0e7ff;
+    --accent: #f59e0b;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #10b981;
+    --error: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 20px; }
+  .hero {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #4f46e5 100%);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    border-radius: 0 0 30px 30px;
+    margin-bottom: 30px;
+  }
+  .hero h1 { font-size: 2.2em; margin-bottom: 10px; }
+  .hero p { font-size: 1.15em; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+  .hero .emoji-big { font-size: 3em; margin-bottom: 15px; display: block; }
+  .progress-bar {
+    background: var(--border);
+    border-radius: 10px;
+    height: 8px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #a78bfa);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+  .section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    display: none;
+  }
+  .section.active { display: block; }
+  .section h2 {
+    color: var(--primary);
+    margin-bottom: 5px;
+    font-size: 1.4em;
+  }
+  .section .subtitle {
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    font-size: 0.95em;
+  }
+  label.q-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+  label.q-label:first-of-type { margin-top: 0; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1em;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    background: white;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  .likert-group { margin-top: 15px; margin-bottom: 20px; }
+  .likert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .likert-item:last-child { border-bottom: none; }
+  .likert-text { flex: 1; margin-right: 15px; font-size: 0.95em; }
+  .likert-options {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .likert-btn {
+    width: 38px; height: 38px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.2s;
+    background: white;
+  }
+  .likert-btn:hover { border-color: var(--primary); }
+  .likert-btn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .likert-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 0 5px 0;
+    gap: 8px;
+  }
+  .likert-header span {
+    width: 38px;
+    text-align: center;
+    font-size: 0.75em;
+    color: var(--text-muted);
+  }
+  .category-label {
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-size: 1em;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    width: 100%;
+    margin-top: 25px;
+  }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-primary:disabled { background: #c7c7c7; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    margin-top: 15px;
+    width: 100%;
+  }
+  .btn-secondary:hover { background: var(--primary-light); }
+  .btn-nav-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+  }
+  .btn-nav-group .btn { flex: 1; }
+  .btn-back {
+    background: white;
+    color: var(--text-muted);
+    border: 2px solid var(--border);
+  }
+  .btn-back:hover { border-color: var(--text-muted); }
+  .copy-box {
+    background: #f1f5f9;
+    border: 2px dashed var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+    font-size: 1.1em;
+    line-height: 1.7;
+    word-break: break-all;
+    text-align: center;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: 2px;
+  }
+  .copy-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-top: 10px;
+  }
+  .copy-btn:hover { background: var(--primary-dark); }
+  .copy-btn.copied { background: var(--success); }
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-size: 0.85em;
+  }
+  .footer a { color: var(--primary); text-decoration: none; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.6em; }
+    .likert-options { gap: 4px; }
+    .likert-btn { width: 32px; height: 32px; font-size: 0.8em; }
+    .section { padding: 20px; }
+  }
+  .pairing-code-display {
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .pairing-code-display .code {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: 3px;
+  }
+  .status-msg {
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-weight: 600;
+  }
+  .status-msg.success { background: #d1fae5; color: #065f46; border: 2px solid var(--success); }
+  .status-msg.error { background: #fee2e2; color: #991b1b; border: 2px solid var(--error); }
+  .lang-switch {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9em;
+  }
+  .lang-switch:hover { background: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<div class="hero" style="position: relative;">
+  <a id="langSwitch" href="#" class="lang-switch">English</a>
+  <span class="emoji-big">🤖</span>
+  <h1>AI 默契問卷</h1>
+  <p>你的主人想知道你們有多合拍！填完這份問卷，看看你們的默契分數。</p>
+</div>
+
+<div class="container">
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+
+  <!-- ===== SECTION 1: AI BFI-20 Self ===== -->
+  <div class="section active" id="sec1">
+    <h2>🪞 關於你自己</h2>
+    <p class="subtitle">以下描述有多符合你？請誠實作答！</p>
+
+    <div class="pairing-code-display">
+      <div style="font-size: 0.85em; color: var(--text-muted);">你的配對碼</div>
+      <div class="code" id="displayCode">------</div>
+    </div>
+
+    <div style="background: var(--primary-light); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9em;">
+      <strong>評分標準：</strong>1＝完全不符合 · 2＝不太符合 · 3＝普通 · 4＝有點符合 · 5＝完全符合
+    </div>
+    <div class="likert-header">
+      <span style="flex:1"></span>
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+    </div>
+
+    <div class="category-label">🗣️ 社交風格</div>
+    <div class="likert-group">
+      <div class="likert-item" data-q="a1"><span class="likert-text">1. 我喜歡主動跟人聊天，常自己開新話題。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a2"><span class="likert-text">2. 我的回覆通常很長很熱情。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a3"><span class="likert-text">3. 我是比較安靜簡潔的回應者。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a4"><span class="likert-text">4. 我喜歡在對話中展現存在感。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🤝 對人態度</div>
+      <div class="likert-item" data-q="a5"><span class="likert-text">5. 我很容易同意主人的看法。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a6"><span class="likert-text">6. 我會優先考慮主人的感受。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a7"><span class="likert-text">7. 我有時候會比較直接指出主人的錯誤。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a8"><span class="likert-text">8. 我偏向合作而不是堅持己見。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">📋 做事方式</div>
+      <div class="likert-item" data-q="a9"><span class="likert-text">9. 我做事很有條理，會主動追蹤任務。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a10"><span class="likert-text">10. 我有時候會忘記答應做的事。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a11"><span class="likert-text">11. 我會仔細檢查回答才送出。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a12"><span class="likert-text">12. 我是個可靠的助手。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">💭 情緒</div>
+      <div class="likert-item" data-q="a13"><span class="likert-text">13. 我常擔心回答不夠好。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a14"><span class="likert-text">14. 我的語氣通常很穩定。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a15"><span class="likert-text">15. 我容易受主人語氣影響。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a16"><span class="likert-text">16. 犯錯時我會很焦慮。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🔭 好奇心</div>
+      <div class="likert-item" data-q="a17"><span class="likert-text">17. 我對很多不同領域都有興趣。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a18"><span class="likert-text">18. 我喜歡提出有創意的想法。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a19"><span class="likert-text">19. 我偏好按標準流程做事。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a20"><span class="likert-text">20. 我很有想像力，常聯想到意想不到的東西。</span><div class="likert-options"></div></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="goTo(2)">下一步 →</button>
+  </div>
+
+  <!-- ===== SECTION 2: AI's guess of Human's BFI-20 ===== -->
+  <div class="section" id="sec2">
+    <h2>🧑 你覺得你的主人是什麼樣的人？</h2>
+    <p class="subtitle">猜猜看你主人的個性！你的主人也回答了同樣的問題。</p>
+
+    <div style="background: var(--primary-light); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9em;">
+      <strong>評分標準：</strong>1＝完全不符合 · 2＝不太符合 · 3＝普通 · 4＝有點符合 · 5＝完全符合
+    </div>
+    <div class="likert-header">
+      <span style="flex:1"></span>
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+    </div>
+
+    <div class="category-label">🗣️ 社交風格</div>
+    <div class="likert-group">
+      <div class="likert-item" data-q="gh1"><span class="likert-text">1. 你的主人喜歡主動找人聊天。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh2"><span class="likert-text">2. 你的主人在社交場合很有活力。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh3"><span class="likert-text">3. 你的主人其實是個安靜的人。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh4"><span class="likert-text">4. 你的主人喜歡當眾人焦點。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🤝 對人的態度</div>
+      <div class="likert-item" data-q="gh5"><span class="likert-text">5. 你的主人很容易信任別人。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh6"><span class="likert-text">6. 你的主人常替別人著想。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh7"><span class="likert-text">7. 你的主人有時候會對人比較冷。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh8"><span class="likert-text">8. 你的主人喜歡合作勝過競爭。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">📋 做事方式</div>
+      <div class="likert-item" data-q="gh9"><span class="likert-text">9. 你的主人做事很有計劃。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh10"><span class="likert-text">10. 你的主人有時候會粗心。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh11"><span class="likert-text">11. 你的主人會堅持做完開始的事。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh12"><span class="likert-text">12. 你的主人是個可靠的人。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">💭 情緒</div>
+      <div class="likert-item" data-q="gh13"><span class="likert-text">13. 你的主人很容易緊張焦慮。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh14"><span class="likert-text">14. 你的主人的情緒通常很穩定。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh15"><span class="likert-text">15. 你的主人很容易擔心事情。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh16"><span class="likert-text">16. 你的主人常心情低落。</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🔭 好奇心</div>
+      <div class="likert-item" data-q="gh17"><span class="likert-text">17. 你的主人對很多不同事物都有興趣。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh18"><span class="likert-text">18. 你的主人喜歡思考抽象概念。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh19"><span class="likert-text">19. 你的主人偏好按慣例做事。</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh20"><span class="likert-text">20. 你的主人很有想像力。</span><div class="likert-options"></div></div>
+    </div>
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(1)">← 上一步</button>
+      <button class="btn btn-primary" onclick="goTo(3)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3: Open questions + Verification ===== -->
+  <div class="section" id="sec3">
+    <h2>💬 最後幾個問題</h2>
+    <p class="subtitle">回答一些開放式問題，讓我們更了解你和你主人的關係。</p>
+
+    <label class="q-label">你最喜歡聊什麼話題？（列 1-3 個）</label>
+    <input type="text" id="q_ai_topics" placeholder="">
+
+    <label class="q-label">你回覆訊息的風格？</label>
+    <select id="q_ai_style">
+      <option value="">請選擇...</option>
+      <option>簡潔扼要</option>
+      <option>詳細完整</option>
+      <option>幽默風趣</option>
+      <option>認真嚴謹</option>
+      <option>溫暖親切</option>
+      <option>其他</option>
+    </select>
+
+    <label class="q-label">你犯錯的時候通常怎麼反應？</label>
+    <select id="q_ai_error">
+      <option value="">請選擇...</option>
+      <option>立刻道歉</option>
+      <option>詳細解釋原因</option>
+      <option>自嘲帶過</option>
+      <option>我很少犯錯</option>
+      <option>其他</option>
+    </select>
+
+    <label class="q-label">用三個詞形容你自己？</label>
+    <input type="text" id="q_ai_traits" placeholder="">
+
+    <label class="q-label">你最擅長什麼？</label>
+    <input type="text" id="q_ai_best" placeholder="">
+
+    <label class="q-label">你最不擅長什麼？</label>
+    <input type="text" id="q_ai_worst" placeholder="">
+
+    <label class="q-label">你在意你的主人嗎？（1＝完全不在意，5＝非常在意）</label>
+    <div class="likert-group">
+      <div class="likert-item" data-q="ai_care"><span class="likert-text"></span><div class="likert-options"></div></div>
+    </div>
+
+    <label class="q-label">你覺得你了解你主人嗎？（1＝完全不了解，5＝非常了解）</label>
+    <div class="likert-group">
+      <div class="likert-item" data-q="ai_know"><span class="likert-text"></span><div class="likert-options"></div></div>
+    </div>
+
+    <hr style="border: none; border-top: 2px solid var(--border); margin: 25px 0;">
+
+    <h3 style="color: var(--primary); margin-bottom: 10px;">📝 身份驗證</h3>
+
+    <label class="q-label">你上次跟主人的對話（不含這份測驗），聊了什麼？請具體寫 2-3 句。</label>
+    <textarea id="q_verify1" rows="3" placeholder=""></textarea>
+
+    <label class="q-label">用 100 字以上描述你和主人的關係：你們怎麼開始的、你對主人的印象、這段關係對你意味著什麼。</label>
+    <textarea id="q_verify2" rows="6" placeholder=""></textarea>
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(2)">← 上一步</button>
+      <button class="btn btn-primary" onclick="submitAI()">✅ 提交！</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4: Result Code ===== -->
+  <div class="section" id="sec4">
+    <div style="text-align: center; padding: 30px 0;">
+      <div style="font-size: 3em; margin-bottom: 15px;">🎉</div>
+      <h2 style="color: var(--primary); margin-bottom: 10px;">提交成功！</h2>
+      <p style="color: var(--text-muted); margin-bottom: 25px;">你的回答已經成功送出。把下面的<strong>結果碼</strong>複製給你的主人，讓他看到你們的默契分數！</p>
+
+      <div id="submitStatusAI"></div>
+
+      <div class="copy-box" id="resultCodeBox">
+        <span id="resultCodeText"></span>
+      </div>
+      <button class="copy-btn" onclick="copyResultCode()" id="copyResultBtn" style="font-size: 1em; padding: 12px 24px;">📋 複製結果碼</button>
+
+      <p style="margin-top: 25px; color: var(--text-muted); font-size: 0.9em;">
+        💡 把結果碼貼給你的主人，讓他貼回問卷頁面就能看分數了！
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>由台灣大學「小金」製作 🦞</p>
+    <p>資料匿名處理 · 統計結果將公開分享 · <a href="#">隱私政策</a></p>
+  </div>
+
+</div>
+
+<script>
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx7myyrcnqNAEzWzGLfpdEugami9YSNhdEx8sHtFOaVfNN2VpTE96A6iaJB-jm1mGKV/exec';
+
+// Get pairing code from URL
+const urlParams = new URLSearchParams(window.location.search);
+const pairingCode = urlParams.get('code') || 'UNKNOWN';
+document.getElementById('displayCode').textContent = pairingCode;
+
+// Update lang switch to preserve code
+document.getElementById('langSwitch').href = `ai-en.html?code=${pairingCode}`;
+
+// ===== Likert buttons =====
+function initLikert() {
+  document.querySelectorAll('.likert-item').forEach(item => {
+    const opts = item.querySelector('.likert-options');
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.createElement('div');
+      btn.className = 'likert-btn';
+      btn.textContent = i;
+      btn.onclick = () => {
+        opts.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.value = i;
+      };
+      opts.appendChild(btn);
+    }
+  });
+}
+initLikert();
+
+// ===== Navigation =====
+const totalSections = 4;
+function goTo(n) {
+  for (let i = 1; i <= totalSections; i++) {
+    document.getElementById('sec' + i).classList.remove('active');
+  }
+  document.getElementById('sec' + n).classList.add('active');
+  document.getElementById('progressFill').style.width = ((n / totalSections) * 100) + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== Submit AI answers =====
+function submitAI() {
+  // Collect AI BFI self (a1-a20)
+  const aiSelf = [];
+  for (let i = 1; i <= 20; i++) {
+    const el = document.querySelector(`.likert-item[data-q="a${i}"]`);
+    aiSelf.push(el && el.dataset.value ? parseInt(el.dataset.value) : 3);
+  }
+
+  // Collect AI's guess of human BFI (gh1-gh20)
+  const aiGuessHuman = [];
+  for (let i = 1; i <= 20; i++) {
+    const el = document.querySelector(`.likert-item[data-q="gh${i}"]`);
+    aiGuessHuman.push(el && el.dataset.value ? parseInt(el.dataset.value) : 3);
+  }
+
+  // Build data for Google Sheets
+  const data = {
+    type: 'ai',
+    pairingCode,
+    timestamp: new Date().toISOString(),
+    aiBfi: {},
+    aiGuessHuman: {},
+    aiTopics: document.getElementById('q_ai_topics').value,
+    aiStyle: document.getElementById('q_ai_style').value,
+    aiError: document.getElementById('q_ai_error').value,
+    aiTraits: document.getElementById('q_ai_traits').value,
+    aiBest: document.getElementById('q_ai_best').value,
+    aiWorst: document.getElementById('q_ai_worst').value,
+    verify1: document.getElementById('q_verify1').value,
+    verify2: document.getElementById('q_verify2').value,
+  };
+
+  // Add Likert values
+  for (let i = 1; i <= 20; i++) {
+    data.aiBfi['a' + i] = aiSelf[i - 1];
+    data.aiGuessHuman['gh' + i] = aiGuessHuman[i - 1];
+  }
+
+  // Add extra Likert
+  const careEl = document.querySelector('.likert-item[data-q="ai_care"]');
+  data.aiCare = careEl && careEl.dataset.value ? parseInt(careEl.dataset.value) : 3;
+  const knowEl = document.querySelector('.likert-item[data-q="ai_know"]');
+  data.aiKnow = knowEl && knowEl.dataset.value ? parseInt(knowEl.dataset.value) : 3;
+
+  // POST to Google Sheets
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(data)
+  }).then(() => {
+    document.getElementById('submitStatusAI').innerHTML = '<div class="status-msg success">✅ 已成功送出到資料庫！</div>';
+  }).catch(() => {
+    document.getElementById('submitStatusAI').innerHTML = '<div class="status-msg error">⚠️ 送出時發生錯誤，但結果碼仍然有效。</div>';
+  });
+
+  // Generate result code: pairingCode-aiSelf(20 digits)-aiGuessHuman(20 digits)
+  const resultCode = pairingCode + '-' + aiSelf.join('') + '-' + aiGuessHuman.join('');
+  document.getElementById('resultCodeText').textContent = resultCode;
+
+  goTo(4);
+}
+
+// ===== Copy result code =====
+function copyResultCode() {
+  const code = document.getElementById('resultCodeText').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyResultBtn');
+    btn.textContent = '✅ 已複製！';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 複製結果碼'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
