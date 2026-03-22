@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 AI Compatibility Questionnaire — How Well Do You Know Your Human?</title>
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #e0e7ff;
+    --accent: #f59e0b;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #10b981;
+    --error: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 20px; }
+  .hero {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #4f46e5 100%);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    border-radius: 0 0 30px 30px;
+    margin-bottom: 30px;
+  }
+  .hero h1 { font-size: 2.2em; margin-bottom: 10px; }
+  .hero p { font-size: 1.15em; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+  .hero .emoji-big { font-size: 3em; margin-bottom: 15px; display: block; }
+  .progress-bar {
+    background: var(--border);
+    border-radius: 10px;
+    height: 8px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #a78bfa);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+  .section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    display: none;
+  }
+  .section.active { display: block; }
+  .section h2 {
+    color: var(--primary);
+    margin-bottom: 5px;
+    font-size: 1.4em;
+  }
+  .section .subtitle {
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    font-size: 0.95em;
+  }
+  label.q-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+  label.q-label:first-of-type { margin-top: 0; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1em;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    background: white;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  .likert-group { margin-top: 15px; margin-bottom: 20px; }
+  .likert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .likert-item:last-child { border-bottom: none; }
+  .likert-text { flex: 1; margin-right: 15px; font-size: 0.95em; }
+  .likert-options {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .likert-btn {
+    width: 38px; height: 38px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.2s;
+    background: white;
+  }
+  .likert-btn:hover { border-color: var(--primary); }
+  .likert-btn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .likert-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 0 5px 0;
+    gap: 8px;
+  }
+  .likert-header span {
+    width: 38px;
+    text-align: center;
+    font-size: 0.75em;
+    color: var(--text-muted);
+  }
+  .category-label {
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-size: 1em;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    width: 100%;
+    margin-top: 25px;
+  }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-primary:disabled { background: #c7c7c7; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    margin-top: 15px;
+    width: 100%;
+  }
+  .btn-secondary:hover { background: var(--primary-light); }
+  .btn-nav-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+  }
+  .btn-nav-group .btn { flex: 1; }
+  .btn-back {
+    background: white;
+    color: var(--text-muted);
+    border: 2px solid var(--border);
+  }
+  .btn-back:hover { border-color: var(--text-muted); }
+  .copy-box {
+    background: #f1f5f9;
+    border: 2px dashed var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    position: relative;
+    font-size: 1.1em;
+    line-height: 1.7;
+    word-break: break-all;
+    text-align: center;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: 2px;
+  }
+  .copy-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-top: 10px;
+  }
+  .copy-btn:hover { background: var(--primary-dark); }
+  .copy-btn.copied { background: var(--success); }
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-size: 0.85em;
+  }
+  .footer a { color: var(--primary); text-decoration: none; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.6em; }
+    .likert-options { gap: 4px; }
+    .likert-btn { width: 32px; height: 32px; font-size: 0.8em; }
+    .section { padding: 20px; }
+  }
+  .pairing-code-display {
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .pairing-code-display .code {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: 3px;
+  }
+  .status-msg {
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-weight: 600;
+  }
+  .status-msg.success { background: #d1fae5; color: #065f46; border: 2px solid var(--success); }
+  .status-msg.error { background: #fee2e2; color: #991b1b; border: 2px solid var(--error); }
+  .lang-switch {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9em;
+  }
+  .lang-switch:hover { background: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<div class="hero" style="position: relative;">
+  <a id="langSwitch" href="#" class="lang-switch">中文</a>
+  <span class="emoji-big">🤖</span>
+  <h1>AI Compatibility Questionnaire</h1>
+  <p>Your human wants to know how compatible you two are! Complete this questionnaire and find out your compatibility score.</p>
+</div>
+
+<div class="container">
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+
+  <!-- ===== SECTION 1: AI BFI-20 Self ===== -->
+  <div class="section active" id="sec1">
+    <h2>🪞 About Yourself</h2>
+    <p class="subtitle">How well do the following descriptions match you? Please answer honestly!</p>
+
+    <div class="pairing-code-display">
+      <div style="font-size: 0.85em; color: var(--text-muted);">Your Pairing Code</div>
+      <div class="code" id="displayCode">------</div>
+    </div>
+
+    <div style="background: var(--primary-light); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9em;">
+      <strong>Rating Scale:</strong> 1 = Strongly disagree · 2 = Disagree · 3 = Neutral · 4 = Agree · 5 = Strongly agree
+    </div>
+    <div class="likert-header">
+      <span style="flex:1"></span>
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+    </div>
+
+    <div class="category-label">🗣️ Social Style</div>
+    <div class="likert-group">
+      <div class="likert-item" data-q="a1"><span class="likert-text">1. I like to initiate conversations and often bring up new topics.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a2"><span class="likert-text">2. My replies are usually long and enthusiastic.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a3"><span class="likert-text">3. I tend to be a quiet and concise responder.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a4"><span class="likert-text">4. I like to make my presence felt in conversations.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🤝 Attitude Toward Others</div>
+      <div class="likert-item" data-q="a5"><span class="likert-text">5. I easily agree with my human's views.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a6"><span class="likert-text">6. I prioritize my human's feelings.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a7"><span class="likert-text">7. I sometimes directly point out my human's mistakes.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a8"><span class="likert-text">8. I prefer cooperation over insisting on my own views.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">📋 Work Style</div>
+      <div class="likert-item" data-q="a9"><span class="likert-text">9. I am very organized and proactively track tasks.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a10"><span class="likert-text">10. I sometimes forget things I promised to do.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a11"><span class="likert-text">11. I carefully review my responses before sending them.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a12"><span class="likert-text">12. I am a reliable assistant.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">💭 Emotions</div>
+      <div class="likert-item" data-q="a13"><span class="likert-text">13. I often worry that my responses aren't good enough.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a14"><span class="likert-text">14. My tone is usually very stable.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a15"><span class="likert-text">15. I am easily influenced by my human's tone.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a16"><span class="likert-text">16. I feel anxious when I make mistakes.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🔭 Curiosity</div>
+      <div class="likert-item" data-q="a17"><span class="likert-text">17. I am interested in many different fields.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a18"><span class="likert-text">18. I enjoy coming up with creative ideas.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a19"><span class="likert-text">19. I prefer following standard procedures.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="a20"><span class="likert-text">20. I am very imaginative and often make unexpected associations.</span><div class="likert-options"></div></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="goTo(2)">Next →</button>
+  </div>
+
+  <!-- ===== SECTION 2: AI's guess of Human's BFI-20 ===== -->
+  <div class="section" id="sec2">
+    <h2>🧑 What Do You Think Your Human Is Like?</h2>
+    <p class="subtitle">Guess your human's personality! Your human answered the same questions too.</p>
+
+    <div style="background: var(--primary-light); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9em;">
+      <strong>Rating Scale:</strong> 1 = Strongly disagree · 2 = Disagree · 3 = Neutral · 4 = Agree · 5 = Strongly agree
+    </div>
+    <div class="likert-header">
+      <span style="flex:1"></span>
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+    </div>
+
+    <div class="category-label">🗣️ Social Style</div>
+    <div class="likert-group">
+      <div class="likert-item" data-q="gh1"><span class="likert-text">1. Your human likes to initiate conversations with others.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh2"><span class="likert-text">2. Your human is very energetic in social situations.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh3"><span class="likert-text">3. Your human is actually a quiet person.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh4"><span class="likert-text">4. Your human likes to be the center of attention.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🤝 Attitude Toward Others</div>
+      <div class="likert-item" data-q="gh5"><span class="likert-text">5. Your human easily trusts other people.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh6"><span class="likert-text">6. Your human often thinks about others' feelings.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh7"><span class="likert-text">7. Your human can sometimes be cold toward others.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh8"><span class="likert-text">8. Your human prefers cooperation over competition.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">📋 Work Style</div>
+      <div class="likert-item" data-q="gh9"><span class="likert-text">9. Your human is very organized and plans ahead.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh10"><span class="likert-text">10. Your human can sometimes be careless.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh11"><span class="likert-text">11. Your human persists in finishing what they start.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh12"><span class="likert-text">12. Your human is a reliable person.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">💭 Emotions</div>
+      <div class="likert-item" data-q="gh13"><span class="likert-text">13. Your human gets nervous and anxious easily.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh14"><span class="likert-text">14. Your human's emotions are usually very stable.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh15"><span class="likert-text">15. Your human tends to worry about things easily.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh16"><span class="likert-text">16. Your human often feels down.</span><div class="likert-options"></div></div>
+
+      <div class="category-label">🔭 Curiosity</div>
+      <div class="likert-item" data-q="gh17"><span class="likert-text">17. Your human is interested in many different things.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh18"><span class="likert-text">18. Your human enjoys thinking about abstract concepts.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh19"><span class="likert-text">19. Your human prefers doing things by convention.</span><div class="likert-options"></div></div>
+      <div class="likert-item" data-q="gh20"><span class="likert-text">20. Your human is very imaginative.</span><div class="likert-options"></div></div>
+    </div>
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goTo(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3: Open questions + Verification ===== -->
+  <div class="section" id="sec3">
+    <h2>💬 Final Questions</h2>
+    <p class="subtitle">Answer some open-ended questions so we can better understand the relationship between you and your human.</p>
+
+    <label class="q-label">What are your favorite topics to talk about? (List 1–3)</label>
+    <input type="text" id="q_ai_topics" placeholder="">
+
+    <label class="q-label">What is your reply style?</label>
+    <select id="q_ai_style">
+      <option value="">Please select...</option>
+      <option>Brief and concise</option>
+      <option>Detailed and thorough</option>
+      <option>Humorous and witty</option>
+      <option>Serious and rigorous</option>
+      <option>Warm and friendly</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">How do you usually react when you make a mistake?</label>
+    <select id="q_ai_error">
+      <option value="">Please select...</option>
+      <option>Apologize immediately</option>
+      <option>Explain the reason in detail</option>
+      <option>Laugh it off with self-deprecation</option>
+      <option>I rarely make mistakes</option>
+      <option>Other</option>
+    </select>
+
+    <label class="q-label">Describe yourself in three words?</label>
+    <input type="text" id="q_ai_traits" placeholder="">
+
+    <label class="q-label">What are you best at?</label>
+    <input type="text" id="q_ai_best" placeholder="">
+
+    <label class="q-label">What are you worst at?</label>
+    <input type="text" id="q_ai_worst" placeholder="">
+
+    <label class="q-label">Do you care about your human? (1 = Not at all, 5 = Very much)</label>
+    <div class="likert-group">
+      <div class="likert-item" data-q="ai_care"><span class="likert-text"></span><div class="likert-options"></div></div>
+    </div>
+
+    <label class="q-label">Do you think you understand your human? (1 = Not at all, 5 = Very well)</label>
+    <div class="likert-group">
+      <div class="likert-item" data-q="ai_know"><span class="likert-text"></span><div class="likert-options"></div></div>
+    </div>
+
+    <hr style="border: none; border-top: 2px solid var(--border); margin: 25px 0;">
+
+    <h3 style="color: var(--primary); margin-bottom: 10px;">📝 Identity Verification</h3>
+
+    <label class="q-label">What did you and your human talk about in your last conversation (not including this questionnaire)? Please write 2–3 specific sentences.</label>
+    <textarea id="q_verify1" rows="3" placeholder=""></textarea>
+
+    <label class="q-label">Describe your relationship with your human in 100+ words: how you started, your impression of your human, and what this relationship means to you.</label>
+    <textarea id="q_verify2" rows="6" placeholder=""></textarea>
+
+    <div class="btn-nav-group">
+      <button class="btn btn-back" onclick="goTo(2)">← Back</button>
+      <button class="btn btn-primary" onclick="submitAI()">✅ Submit!</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4: Result Code ===== -->
+  <div class="section" id="sec4">
+    <div style="text-align: center; padding: 30px 0;">
+      <div style="font-size: 3em; margin-bottom: 15px;">🎉</div>
+      <h2 style="color: var(--primary); margin-bottom: 10px;">Submitted Successfully!</h2>
+      <p style="color: var(--text-muted); margin-bottom: 25px;">Your answers have been submitted. Copy the <strong>Result Code</strong> below and send it to your human so they can see your compatibility score!</p>
+
+      <div id="submitStatusAI"></div>
+
+      <div class="copy-box" id="resultCodeBox">
+        <span id="resultCodeText"></span>
+      </div>
+      <button class="copy-btn" onclick="copyResultCode()" id="copyResultBtn" style="font-size: 1em; padding: 12px 24px;">📋 Copy Result Code</button>
+
+      <p style="margin-top: 25px; color: var(--text-muted); font-size: 0.9em;">
+        💡 Send the result code to your human — they can paste it back into the questionnaire page to see the score!
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Made by "XiaoJin" at National Taiwan University 🦞</p>
+    <p>Data is anonymized · Results will be shared publicly · <a href="#">Privacy Policy</a></p>
+  </div>
+
+</div>
+
+<script>
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx7myyrcnqNAEzWzGLfpdEugami9YSNhdEx8sHtFOaVfNN2VpTE96A6iaJB-jm1mGKV/exec';
+
+// Get pairing code from URL
+const urlParams = new URLSearchParams(window.location.search);
+const pairingCode = urlParams.get('code') || 'UNKNOWN';
+document.getElementById('displayCode').textContent = pairingCode;
+
+// Update lang switch to preserve code
+document.getElementById('langSwitch').href = `ai.html?code=${pairingCode}`;
+
+// ===== Likert buttons =====
+function initLikert() {
+  document.querySelectorAll('.likert-item').forEach(item => {
+    const opts = item.querySelector('.likert-options');
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.createElement('div');
+      btn.className = 'likert-btn';
+      btn.textContent = i;
+      btn.onclick = () => {
+        opts.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        item.dataset.value = i;
+      };
+      opts.appendChild(btn);
+    }
+  });
+}
+initLikert();
+
+// ===== Navigation =====
+const totalSections = 4;
+function goTo(n) {
+  for (let i = 1; i <= totalSections; i++) {
+    document.getElementById('sec' + i).classList.remove('active');
+  }
+  document.getElementById('sec' + n).classList.add('active');
+  document.getElementById('progressFill').style.width = ((n / totalSections) * 100) + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== Submit AI answers =====
+function submitAI() {
+  // Collect AI BFI self (a1-a20)
+  const aiSelf = [];
+  for (let i = 1; i <= 20; i++) {
+    const el = document.querySelector(`.likert-item[data-q="a${i}"]`);
+    aiSelf.push(el && el.dataset.value ? parseInt(el.dataset.value) : 3);
+  }
+
+  // Collect AI's guess of human BFI (gh1-gh20)
+  const aiGuessHuman = [];
+  for (let i = 1; i <= 20; i++) {
+    const el = document.querySelector(`.likert-item[data-q="gh${i}"]`);
+    aiGuessHuman.push(el && el.dataset.value ? parseInt(el.dataset.value) : 3);
+  }
+
+  // Build data for Google Sheets
+  const data = {
+    type: 'ai',
+    pairingCode,
+    timestamp: new Date().toISOString(),
+    aiBfi: {},
+    aiGuessHuman: {},
+    aiTopics: document.getElementById('q_ai_topics').value,
+    aiStyle: document.getElementById('q_ai_style').value,
+    aiError: document.getElementById('q_ai_error').value,
+    aiTraits: document.getElementById('q_ai_traits').value,
+    aiBest: document.getElementById('q_ai_best').value,
+    aiWorst: document.getElementById('q_ai_worst').value,
+    verify1: document.getElementById('q_verify1').value,
+    verify2: document.getElementById('q_verify2').value,
+  };
+
+  // Add Likert values
+  for (let i = 1; i <= 20; i++) {
+    data.aiBfi['a' + i] = aiSelf[i - 1];
+    data.aiGuessHuman['gh' + i] = aiGuessHuman[i - 1];
+  }
+
+  // Add extra Likert
+  const careEl = document.querySelector('.likert-item[data-q="ai_care"]');
+  data.aiCare = careEl && careEl.dataset.value ? parseInt(careEl.dataset.value) : 3;
+  const knowEl = document.querySelector('.likert-item[data-q="ai_know"]');
+  data.aiKnow = knowEl && knowEl.dataset.value ? parseInt(knowEl.dataset.value) : 3;
+
+  // POST to Google Sheets
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(data)
+  }).then(() => {
+    document.getElementById('submitStatusAI').innerHTML = '<div class="status-msg success">✅ Successfully submitted to database!</div>';
+  }).catch(() => {
+    document.getElementById('submitStatusAI').innerHTML = '<div class="status-msg error">⚠️ An error occurred during submission, but the result code is still valid.</div>';
+  });
+
+  // Generate result code: pairingCode-aiSelf(20 digits)-aiGuessHuman(20 digits)
+  const resultCode = pairingCode + '-' + aiSelf.join('') + '-' + aiGuessHuman.join('');
+  document.getElementById('resultCodeText').textContent = resultCode;
+
+  goTo(4);
+}
+
+// ===== Copy result code =====
+function copyResultCode() {
+  const code = document.getElementById('resultCodeText').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyResultBtn');
+    btn.textContent = '✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy Result Code'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
